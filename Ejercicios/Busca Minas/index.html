@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscaminas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #tablero {
+            display: grid;
+            margin: 20px auto;
+            gap: 2px;
+        }
+        .celda {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #ccc;
+            border: 1px solid #888;
+            cursor: pointer;
+        }
+        .mina {
+            background-color: red !important;
+        }
+        .bandera {
+            background-color: yellow !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Buscaminas</h1>
+    <label for="nivel">Selecciona un nivel:</label>
+    <select id="nivel">
+        <option value="8x8">Fácil (8x8)</option>
+        <option value="16x16">Medio (16x16)</option>
+        <option value="16x30">Difícil (16x30)</option>
+    </select>
+    <div id="tablero"></div>
+
+    <script>
+        let tablero = [];
+        let juegoTerminado = false;
+
+        document.getElementById("nivel").addEventListener("change", generarTablero);
+
+        function generarTablero() {
+            if (juegoTerminado) return;
+
+            let [filas, columnas] = document.getElementById("nivel").value.split("x").map(Number);
+            fetch("generar_tablero.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ filas, columnas })
+            })
+            .then(response => response.json())
+            .then(data => {
+                tablero = data;
+                renderizarTablero(filas, columnas);
+            });
+        }
+
+        function renderizarTablero(filas, columnas) {
+            let contenedor = document.getElementById("tablero");
+            contenedor.innerHTML = "";
+            contenedor.style.gridTemplateColumns = `repeat(${columnas}, 30px)`;
+            contenedor.style.gridTemplateRows = `repeat(${filas}, 30px)`;
+
+            for (let i = 0; i < filas; i++) {
+                for (let j = 0; j < columnas; j++) {
+                    let celda = document.createElement("div");
+                    celda.classList.add("celda");
+                    celda.dataset.fila = i;
+                    celda.dataset.columna = j;
+
+                    celda.addEventListener("click", () => revelarCelda(i, j));
+                    celda.addEventListener("contextmenu", (e) => {
+                        e.preventDefault();
+                        marcarBandera(celda);
+                    });
+
+                    contenedor.appendChild(celda);
+                }
+            }
+        }
+
+        function revelarCelda(fila, columna) {
+            if (juegoTerminado) return;
+
+            fetch("revelar_celda.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fila, columna })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let celda = document.querySelector(`.celda[data-fila='${fila}'][data-columna='${columna}']`);
+                if (data.mina) {
+                    celda.classList.add("mina");
+                    juegoTerminado = true;
+                    alert("¡Boom! Has perdido.");
+                    revelarTodasLasMinas();
+                } else {
+                    celda.innerText = data.valor;
+                    celda.style.backgroundColor = "#fff";
+                }
+            });
+        }
+
+        function marcarBandera(celda) {
+            if (juegoTerminado) return;
+            if (celda.classList.contains("bandera")) {
+                celda.classList.remove("bandera");
+            } else {
+                celda.classList.add("bandera");
+            }
+        }
+
+        function revelarTodasLasMinas() {
+            document.querySelectorAll(".celda").forEach(celda => {
+                let fila = celda.dataset.fila;
+                let columna = celda.dataset.columna;
+                if (tablero[fila][columna] === "*") {
+                    celda.classList.add("mina");
+                }
+            });
+        }
+
+        generarTablero();
+    </script>
+</body>
+</html>
