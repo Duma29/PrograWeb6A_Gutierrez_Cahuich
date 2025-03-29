@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+    <servlet>
+        <servlet-name>ServletInsertar</servlet-name>
+        <servlet-class>ServletInsertar</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletInsertar</servlet-name>
+        <url-pattern>/insertar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletConsultar</servlet-name>
+        <servlet-class>ServletConsultar</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletConsultar</servlet-name>
+        <url-pattern>/consultar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletActualizar</servlet-name>
+        <servlet-class>ServletActualizar</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletActualizar</servlet-name>
+        <url-pattern>/actualizar</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ServletEliminar</servlet-name>
+        <servlet-class>ServletEliminar</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletEliminar</servlet-name>
+        <url-pattern>/eliminar</url-pattern>
+    </servlet-mapping>
+
+</web-app>
